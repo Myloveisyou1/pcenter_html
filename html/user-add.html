@@ -190,8 +190,8 @@
                 success:function(data){
                     console.log(data);
                     if(data.code == 200) {
-                        layer.msg("修改成功",{icon:6,time:2000},function(){
-                            location.reload();
+                        layer.msg("修改成功,请在用户列表查看",{icon:6,time:2000},function(){
+                            //location.reload();
                         });
 
                     } else if(data.code == 404){
@@ -199,7 +199,7 @@
                     } else if(data.code == 500){
                         window.location.href = "500.html";
                     } else {
-                        layer.msg(data.msg,{icon:5});
+                        layer.msg(data.msg,{icon:2});
                     }
 
                 }
@@ -219,8 +219,8 @@
                 success:function(data){
                     console.log(data);
                     if(data.code == 200) {
-                        layer.msg("添加成功",{icon:6,time:2000},function(){
-                            location.reload();
+                        layer.msg("添加成功，请在用户列表查看",{icon:6,time:2000},function(){
+                            //location.reload();
                         });
 
                     } else if(data.code == 404){
@@ -228,7 +228,7 @@
                     } else if(data.code == 500){
                         window.location.href = "500.html";
                     } else {
-                        layer.msg(data.msg,{icon:5});
+                        layer.msg(data.msg,{icon:2});
                     }
 
                 }
@@ -275,7 +275,7 @@
                 } else if(data.code == 500){
                     window.location.href = "500.html";
                 } else {
-                    alert(data.msg);
+                    layer.msg(data.msg,{icon:2});
                 }
 
             }

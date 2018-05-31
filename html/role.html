@@ -19,7 +19,7 @@
         <a href="">首页</a>
         <a href="">系统设置</a>
         <a>
-            <cite>用户配置</cite></a>
+            <cite>角色配置</cite></a>
       </span>
     <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" href="javascript:location.replace(location.href);" title="刷新">
         <i class="layui-icon" style="line-height:30px">ဂ</i></a>
@@ -27,13 +27,13 @@
 <div class="x-body">
     <div class="layui-row">
         <form class="layui-form layui-col-md12 x-so">
-            <input type="text" id="username"  placeholder="请输入用户名" autocomplete="off" class="layui-input">
-            <button type="button" class="layui-btn"  lay-submit="" lay-filter="sreach"><i class="layui-icon" onclick="findAllUser()">&#xe615;</i></button>
+            <input type="text" id="roleName"  placeholder="请输入角色名" autocomplete="off" class="layui-input">
+            <button type="button" class="layui-btn"  lay-submit="" lay-filter="sreach"><i class="layui-icon" onclick="findAllRole()">&#xe615;</i></button>
         </form>
     </div>
     <xblock>
         <!--<button class="layui-btn layui-btn-danger" onclick="delAll()"><i class="layui-icon"></i>批量删除</button>-->
-        <button class="layui-btn" onclick="x_admin_show('添加用户','user-add.html')"><i class="layui-icon"></i>添加</button>
+        <button class="layui-btn" onclick="x_admin_show('添加角色','role-add.html')"><i class="layui-icon"></i>添加</button>
         <span class="x-right" style="line-height:40px" id="totalCount"></span>
     </xblock>
     <table class="layui-table">
@@ -43,12 +43,10 @@
                 <div class="layui-unselect header layui-form-checkbox" lay-skin="primary"><i class="layui-icon">&#xe605;</i></div>
             </th>
             <th>ID</th>
-            <th>用户名称</th>
-            <th>联系方式</th>
-            <th>邮箱</th>
-            <th>所属角色</th>
+            <th>角色名称</th>
+            <th>英文名称</th>
             <th>创建时间</th>
-            <th>登录时间</th>
+            <th>修改时间</th>
             <th>状态</th>
             <th>操作</th>
         </thead>
@@ -61,25 +59,24 @@
 <script type="text/javascript" src="../static/js/common/base-code.js"></script>
 <script type="text/javascript" src="../static/js/common/basic.js"></script>
 <script>
-
     $(function () {
-        findAllUser();
+        findAllRole();
     });
 
-    /*用户-停用*/
-    function member_stop(userName,type){
+    /*角色-停用*/
+    function role_stop(gid,type){
 
         var tishi = type == 0?"启用":"禁用";
         layer.confirm('确认要'+tishi+'吗？',function(index){
 
             if (index) {
                 $.ajax({
-                    url:URL+"user/updateUser",
+                    url:URL+"role/updateRole",
                     type:"get",
                     dataType:"json",
                     data:{
                         sessionId:SESSIONID,
-                        userName:userName,
+                        gid:gid,
                         status:type
                     },
                     success:function(data){
@@ -102,7 +99,7 @@
         });
     }
 
-    /*用户-删除*/
+    /*角色-删除*/
     function member_del(userName){
         layer.confirm('确认要删除吗？',function(index){
             if (index) {
@@ -145,16 +142,19 @@
         });
     }
 
-    function findAllUser() {
-
-        var userName = $("#username").val();
+    /**
+     * 查询所有角色
+     **/
+    function findAllRole() {
+        var roleName = $("#roleName").val();
         $.ajax({
-            url:URL+"user/findAllUser",
+            url:URL+"role/findAllRole",
             type:"get",
+            async:false,
             dataType:"json",
             data:{
                 sessionId:SESSIONID,
-                userName:userName
+                roleName:roleName
             },
             success:function(data){
                 console.log(data);
@@ -163,27 +163,25 @@
                     if(res.length > 0) {
                         var html = "";
                         for(var i=0;i<res.length;i++) {
-                            var a = "",b = "",c = "'"+res[i].userName+"'",d = "'编辑'"+",'user-add.html?userName="+res[i].userName+"&roleId="+res[i].roleId+"'";
+                            var a = "",b = "",c = res[i].gid,d = "'编辑'"+",'role-add.html?roleName="+res[i].roleName+"&roleId="+res[i].gid+"&roleNameEn="+res[i].roleNameEn+"'";
                             if(res[i].status == 0) {
                                 a = '<span class="layui-btn layui-btn-normal layui-btn-mini">启用</span>';
-                                b = '<a onclick="member_stop('+c+',1)" href="javascript:;"  title="启用"><i class="layui-icon">&#xe601;</i></a>';
+                                b = '<a onclick="role_stop('+c+',1)" href="javascript:;"  title="启用"><i class="layui-icon">&#xe601;</i></a>';
                             } else if(res[i].status == 1) {
                                 a = '<span class="layui-btn layui-btn-normal layui-btn-mini layui-btn-disabled">禁用</span>';
-                                b = '<a onclick="member_stop('+c+',0)" href="javascript:;"  title="停用"><i class="layui-icon">&#xe62f;</i></a>';
+                                b = '<a onclick="role_stop('+c+',0)" href="javascript:;"  title="停用"><i class="layui-icon">&#xe62f;</i></a>';
                             }
                             console.log(b);
                             html += '<tr><td><div class="layui-unselect layui-form-checkbox" lay-skin="primary" data-id="2"><i class="layui-icon">&#xe605;</i></div></td>'+
-                            '<td>'+(i+1)+'</td>' +
-                            '<td>'+res[i].userName+'</td>' +
-                            '<td>'+res[i].tel+'</td>' +
-                            '<td>'+res[i].email+'</td>' +
-                            '<td>'+res[i].roleName+'</td>' +
-                            '<td>'+res[i].createTime+'</td>' +
-                            '<td>'+res[i].updateTime+'</td>' +
-                            '<td class="td-status">'+a+'</td>' +
-                            '<td class="td-manage">'+b+
-                            '<a title="编辑"  onclick="x_admin_show('+d+')" href="javascript:;"><i class="layui-icon">&#xe642;</i></a>'+
-                            '<a title="删除" onclick="member_del('+c+')" href="javascript:;"><i class="layui-icon">&#xe640;</i></a></td></tr>';
+                                    '<td>'+(i+1)+'</td>' +
+                                    '<td>'+res[i].roleName+'</td>' +
+                                    '<td>'+res[i].roleNameEn+'</td>' +
+                                    '<td>'+res[i].createTime+'</td>' +
+                                    '<td>'+res[i].updateTime+'</td>' +
+                                    '<td class="td-status">'+a+'</td>' +
+                                    '<td class="td-manage">'+b+
+                                    '<a title="编辑"  onclick="x_admin_show('+d+')" href="javascript:;"><i class="layui-icon">&#xe642;</i></a>'+
+                                    '<a title="删除" onclick="member_del('+c+')" href="javascript:;"><i class="layui-icon">&#xe640;</i></a></td></tr>';
                         }
 
                     } else {
@@ -198,10 +196,8 @@
                 } else {
                     layer.msg(data.msg,{icon:2});
                 }
-
             }
         });
-
     }
 </script>
 </body>
