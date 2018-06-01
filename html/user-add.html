@@ -138,11 +138,10 @@
      * 增加用户
      * */
     function addUser() {
-        var userName = $("#username").val();
         var phone = $("#phone").val();
         var email = $("#L_email").val();
-        var userName = $("#username").val();
-        if(userName == "" || phone == "" || email == "") {
+        var userNames = $("#username").val();
+        if(userNames == "" || phone == "" || email == "") {
             layer.msg("请完整填写信息",{icon:2});
             return;
         }
@@ -174,15 +173,14 @@
             layer.msg("请选择一个角色",{icon:2});
             return;
         }
-
-        if(userName != undefined) {
+        if(userName != undefined && userName != "") {
             $.ajax({
                 url:URL+"user/updateUser",
                 type:"get",
                 dataType:"json",
                 data:{
                     sessionId:SESSIONID,
-                    userName:userName,
+                    userName:userNames,
                     tel:phone,
                     email:email,
                     roleId: s.split(",")[0]
@@ -211,7 +209,7 @@
                 dataType:"json",
                 data:{
                     sessionId:SESSIONID,
-                    userName:userName,
+                    userName:userNames,
                     tel:phone,
                     email:email,
                     roleId: s.split(",")[0]

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>日志信息</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+
+    <!-- 公共css+js -->
+    <script src="../static/js/common/base-css.js"></script>
+    <script src="../static/js/common/base-js.js"></script>
+
+</head>
+
+<body>
+<div class="x-nav">
+      <span class="layui-breadcrumb">
+        <a href="">首页</a>
+        <a href="">系统设置</a>
+        <a>
+            <cite>日志记录</cite></a>
+      </span>
+    <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" href="javascript:location.replace(location.href);" title="刷新">
+        <i class="layui-icon" style="line-height:30px">ဂ</i></a>
+</div>
+<div class="x-body">
+    <div class="layui-row">
+        <form class="layui-form layui-col-md12 x-so">
+            <input class="layui-input" placeholder="开始日" name="start" id="start">
+            <input class="layui-input" placeholder="截止日" name="end" id="end">
+            <button class="layui-btn" type="button"  lay-submit="" lay-filter="sreach" onclick="queryLogs()"><i class="layui-icon">&#xe615;</i></button>
+        </form>
+    </div>
+    <xblock>
+    </xblock>
+    <table class="layui-table" id="demo">
+
+    </table>
+    <!--<div class="page">
+        <div>
+            <a class="prev" href="">&lt;&lt;</a>
+            <a class="num" href="">1</a>
+            <span class="current">2</span>
+            <a class="num" href="">3</a>
+            <a class="num" href="">489</a>
+            <a class="next" href="">&gt;&gt;</a>
+        </div>
+    </div>-->
+
+</div>
+
+<script type="text/javascript" src="../static/js/common/base-code.js"></script>
+<script type="text/javascript" src="../static/js/common/basic.js"></script>
+<script>
+
+    var result = "";
+    var startTime = "";
+    var endTime = "";
+
+    layui.use('laydate', function(){
+        var laydate = layui.laydate;
+
+        //执行一个laydate实例
+        laydate.render({
+            elem: '#start' //指定元素
+        });
+
+        //执行一个laydate实例
+        laydate.render({
+            elem: '#end' //指定元素
+        });
+    });
+
+    $(function () {
+        layui.use('table', function(){
+            var table = layui.table;
+
+            result= table.render({
+                elem: '#demo'
+                ,height: 515
+                ,url: URL+"logs/logsList" //数据接口
+                ,request: {
+                    pageName: 'pageNum' //页码的参数名称，默认：page
+                    ,limitName: 'pageSize' //每页数据量的参数名，默认：limit
+                }
+                ,where:{
+                    sessionId:SESSIONID
+                }
+                ,page: true //开启分页
+                ,cols: [[ //表头
+                    {field: 'gid', title: 'ID', width:80, sort: true, fixed: 'left'}
+                    ,{field: 'url', title: '请求地址'}
+                    ,{field: 'method', title: '请求方法', sort: true}
+                    ,{field: 'ip', title: '请求IP'}
+                    ,{field: 'args', title: '请求参数'}
+                    ,{field: 'startTime', title: '请求开始时间', sort: true}
+                    ,{field: 'endTime', title: '请求结束时间', sort: true}
+                    ,{field: 'time', title: '耗时'}
+                    ,{field: 'repData', title: '返回值', sort: true}
+                ]]
+                ,response: {
+                    statusName: 'code' //数据状态的字段名称，默认：code
+                    ,statusCode: 200 //成功的状态码，默认：0
+                    ,msgName: 'hint' //状态信息的字段名称，默认：msg
+                    ,countName: 'totalCount' //数据总数的字段名称，默认：count
+                    ,dataName: 'data' //数据列表的字段名称，默认：data
+                }
+                ,done: function(res, curr, count){
+                    //如果是异步请求数据方式，res即为你接口返回的信息。
+                    //如果是直接赋值的方式，res即为：{data: [], count: 99} data为当前页数据、count为数据总长度
+                    console.log(res);
+
+                    //得到当前页码
+                    console.log(curr);
+
+                    //得到数据总量
+                    console.log(count);
+                }
+            });
+
+        });
+    })
+
+    function queryLogs() {
+        startTime = $("#start").val();
+        endTime = $("#end").val();
+        //第一个实例
+        result.reload({
+            where: { //设定异步数据接口的额外参数，任意设
+                sessionId:SESSIONID,
+                startTime:startTime,
+                endTime:endTime
+            }
+            ,page: {
+                curr: 1 //重新从第 1 页开始
+            }
+        });
+    }
+</script>
+</body>
+
+</html>

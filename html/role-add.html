@@ -144,13 +144,19 @@
                     if(menu != null && menu.length > 0) {
                         for(var i=0;i<menu.length;i++) {
                             var menuList = menu[i].menuList;
-                            html += '<tr><td>' +
-                                    '<input type="checkbox" name="menu" lay-skin="primary" title="'+menu[i].menuName+'" value="'+menu[i].gid+'">' +
-                                    '</td><td><div class="layui-input-block">';
+                            if(menu[i].status == 0) {
+
+                                html += '<tr><td>' +
+                                        '<input type="checkbox" name="menu" lay-skin="primary" title="'+menu[i].menuName+'" value="'+menu[i].gid+'">' +
+                                        '</td><td><div class="layui-input-block">';
+                            }
                             var str = "";
                             if (menuList.length > 0) {
                                 for(var j=0;j<menuList.length;j++) {
-                                    str += '<input name="menu" lay-skin="primary" type="checkbox" title="'+menuList[j].menuName+'" value="'+menuList[j].gid+'">';
+                                    if(menuList[j].status == 0) {
+
+                                        str += '<input name="menu" lay-skin="primary" type="checkbox" title="'+menuList[j].menuName+'" value="'+menuList[j].gid+'">';
+                                    }
                                 }
                             }
                             html += str+'</div></td></tr>';
@@ -177,9 +183,9 @@
      */
     function addRole() {
 
-        var roleName = $("#roleName").val();
+        var roleNames = $("#roleName").val();
         var roleNameEn = $("#roleNameEn").val();
-        if(roleName == "" || roleNameEn == "") {
+        if(roleNames == "" || roleNameEn == "") {
             layer.msg("请填写角色名称",{icon:5});
             return;
         }
@@ -205,7 +211,7 @@
                 dataType:"json",
                 data:{
                     sessionId:SESSIONID,
-                    roleName:roleName,
+                    roleName:roleNames,
                     roleNameEn:roleNameEn,
                     ymenus:menus,
                     nmenus:nmenus
@@ -233,7 +239,7 @@
                 dataType:"json",
                 data:{
                     sessionId:SESSIONID,
-                    roleName:roleName,
+                    roleName:roleNames,
                     roleNameEn:roleNameEn,
                     menus:menus
                 },
