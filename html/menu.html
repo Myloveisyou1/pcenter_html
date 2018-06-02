@@ -34,7 +34,7 @@
         </form>
     </div>-->
     <xblock>
-        <button class="layui-btn" onclick="addChild()"><i class="layui-icon"></i>添加</button>
+        <button class="layui-btn" onclick="addParent()"><i class="layui-icon"></i>添加</button>
         <!--<span class="x-right" style="line-height:40px">共有数据：88 条</span>-->
     </xblock>
     <table class="layui-table layui-form" id="demo">
@@ -58,14 +58,156 @@
     </table>
 </div>
 
+<div id="addMenu" style="display: none">
+    <form class="layui-form">
+        <div class="layui-form-item">
+            <label for="menu_name" class="layui-form-label">
+                <span class="x-red">*</span>菜单名称
+            </label>
+            <div class="layui-input-inline">
+                <input type="text" id="menu_name" required="" lay-verify="pass"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="menu_url" class="layui-form-label">
+                <span class="x-red">*</span>菜单路径
+            </label>
+            <div class="layui-input-inline">
+                <input type="text" id="menu_url" required="" lay-verify="pass"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="menu_icon" class="layui-form-label">
+                <span class="x-red">*</span>菜单图标
+            </label>
+            <div class="layui-input-inline">
+                <input type="text" id="menu_icon" required="" readonly lay-verify="pass" onclick="showIcon()"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="menu_project" class="layui-form-label">
+                <span class="x-red">*</span>所属项目
+            </label>
+            <div class="layui-input-inline layui-form" lay-filter="selFilter">
+                <select name="menu_project" id="menu_project" lay-verify="required">
 
+                </select>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div id="iconList" style="display: none">
+    <table class="layui-table layui-form" id="icon">
+        <thead>
+        <tr>
+            <th>图标名称</th>
+            <th>图标图片</th>
+        </thead>
+        <tbody class="x-cate" id="icon_table">
+
+        </tbody>
+    </table>
+</div>
 <script type="text/javascript" src="../static/js/common/base-code.js"></script>
 <script type="text/javascript" src="../static/js/common/basic.js"></script>
 <script>
-    $(function () {
-        searchMenu();
+    var form = "",icon = "";
+    layui.use('form', function(){
+         form = layui.form;
+
     });
 
+    $(function () {
+        searchMenu();
+        findIconList();
+        findAllProject();
+    });
+
+    /**
+     * 查询图标
+     * */
+    function findIconList() {
+        $.ajax({
+            url:URL+"menu/findIconList",
+            type:"get",
+            async:false,
+            dataType:"json",
+            data:{
+                sessionId:SESSIONID
+            },
+            success:function(data){
+                console.log(data);
+                if(data.code == 200) {
+                    var res = data.data;
+                    if(res.length > 0) {
+                        var html = "";
+                        for(var i=0;i<res.length;i++) {
+                            var name = "'"+res[i].url+"',";
+                            html += '<tr onclick="getIcon('+name+res[i].gid+')">'+
+                                    '<td>'+res[i].name+'</td>' +
+                                    '<td><i class="iconfont">'+res[i].url+'</i></td></tr>';
+                        }
+
+                    } else {
+                        html += '<tr><td colspan="100" align="center">暂无数据</td></tr>';
+                    }
+                    $("#icon_table").html(html);
+                } else if(data.code == 404){
+                    window.location.href = "404.html";
+                } else if(data.code == 500){
+                    window.location.href = "500.html";
+                } else {
+                    layer.msg(data.msg,{icon:2});
+                }
+            }
+        });
+    }
+
+    function findAllProject() {
+
+        $.ajax({
+            url:URL+"project/findAllProject",
+            type:"get",
+            dataType:"json",
+            data:{
+                sessionId:SESSIONID
+            },
+            success:function(data){
+                console.log(data);
+                if(data.code == 200) {
+                    var res = data.data;
+                    if(res.length > 0) {
+                        var html = "";
+                        for(var i=0;i<res.length;i++) {
+                            html += '<option value="'+res[i].gid+'">'+res[i].projectName+'</option>';
+                        }
+                    }
+                    console.log(html);
+//                    $(html).appendTo("#menu_project")//添加下拉框的option
+                    $("#menu_project").html(html);
+                    form.render("select","selFilter");
+                } else if(data.code == 404){
+                    window.location.href = "404.html";
+                } else if(data.code == 500){
+                    window.location.href = "500.html";
+                } else {
+                    layer.msg(data.msg,{icon:2});
+                }
+            }
+        });
+    }
+
+    function getIcon(name,url) {
+
+        layer.close(layer.index);
+        console.log(name);
+        icon = name;
+        $("#menu_icon").val(url);
+    }
     /**
      * 查询菜单列表
      * */
@@ -111,7 +253,7 @@
                                         '<td>'+data[i].updateTime+'</td>'+
                                         '<td class="td-manage">'+
                                         '<button class="layui-btn layui-btn layui-btn-xs"  onclick="editMenu('+data[i].gid+')" ><i class="layui-icon">&#xe642;</i>编辑</button>'+
-                                        '<button class="layui-btn layui-btn-warm layui-btn-xs"  onclick="addChild('+data[i].gid+')" ><i class="layui-icon">&#xe642;</i>添加子栏目</button>'+
+                                        '<button class="layui-btn layui-btn layui-btn-xs"  onclick="addChild('+data[i].gid+')" ><i class="layui-icon">&#xe642;</i>子栏目</button>'+
                                         '<button class="layui-btn-danger layui-btn layui-btn-xs"  onclick="member_del('+data[i].gid+')" href="javascript:;" ><i class="layui-icon">&#xe640;</i>删除</button></td></tr>';
 
                             }
@@ -135,6 +277,107 @@
 
     }
 
+    /**
+     * 添加一级菜单
+     * */
+    function addParent() {
+
+        findAllProject();
+
+        layer.open({
+            type:1,
+            title: '添加菜单',
+            content: $("#addMenu"),
+            area: ['400px', '500px'],
+            btn:['添加','取消'],
+            yes: function (index,layero) {
+
+                var menu_name = $("#menu_name").val();
+                var menu_url = $("#menu_url").val();
+
+                if(menu_name == "" || menu_url == "") {
+                    layer.msg("信息未填写完整",{icon:5});
+                    return;
+                }
+
+                $.ajax({
+                    url:URL+"menu/addMenu",
+                    type:"get",
+                    dataType:"json",
+                    data:{
+                        sessionId:SESSIONID,
+                        menuName:menu_name,
+                        url:menu_url,
+                        belong:$("#menu_project").val(),
+                        icon:icon
+                    },
+                    success:function(data){
+                        console.log(data);
+                        if(data.code == 200) {
+                            layer.msg("添加成功,请在项目列表查看",{icon:6,time:2000},function(){
+                                location.reload();
+                            });
+                        } else if(data.code == 404){
+                            window.location.href = "404.html";
+                        } else if(data.code == 500){
+                            window.location.href = "500.html";
+                        } else {
+                            layer.msg(data.msg,{icon:2});
+                        }
+
+                    }
+                });
+            }
+        });
+
+    }
+
+    function showIcon() {
+
+        layer.open({
+            type:1,
+            title: '图标列表',
+            content: $("#iconList"),
+            area: ['500px', '300px'],
+            yes: function (index,layero) {
+
+                var projectName = $("#project_name").val();
+                var nameEn = $("#name_en").val();
+
+                if(projectName == "" || nameEn == "") {
+                    layer.msg("信息未填写完整",{icon:5});
+                    return;
+                }
+
+                $.ajax({
+                    url:URL+"project/addProject",
+                    type:"get",
+                    dataType:"json",
+                    data:{
+                        sessionId:SESSIONID,
+                        projectName:projectName,
+                        nameEn:nameEn
+                    },
+                    success:function(data){
+                        console.log(data);
+                        if(data.code == 200) {
+                            layer.msg("添加成功,请在项目列表查看",{icon:6,time:2000},function(){
+                                location.reload();
+                            });
+                        } else if(data.code == 404){
+                            window.location.href = "404.html";
+                        } else if(data.code == 500){
+                            window.location.href = "500.html";
+                        } else {
+                            layer.msg(data.msg,{icon:2});
+                        }
+
+                    }
+                });
+            }
+        });
+    }
+
     function editMenu(id) {
 
         layer.msg("功能开发中...",{icon:5});
@@ -147,12 +390,33 @@
     }
     /*用户-删除*/
     function member_del(id){
-        layer.msg("功能开发中...",{icon:5});
-        return;
+
         layer.confirm('该菜单下的子类也会删除,确认要删除吗？',function(index){
-            //发异步删除数据
-            $(obj).parents("tr").remove();
-            layer.msg('已删除!',{icon:1,time:1000});
+
+            $.ajax({
+                url:URL+"menu/delMenu",
+                type:"get",
+                dataType:"json",
+                data:{
+                    sessionId:SESSIONID,
+                    gid:id
+                },
+                success:function(data){
+                    console.log(data);
+                    if(data.code == 200) {
+                        layer.msg("删除成功,请在项目列表查看",{icon:6,time:2000},function(){
+                            location.reload();
+                        });
+                    } else if(data.code == 404){
+                        window.location.href = "404.html";
+                    } else if(data.code == 500){
+                        window.location.href = "500.html";
+                    } else {
+                        layer.msg(data.msg,{icon:2});
+                    }
+
+                }
+            });
         });
     }
 </script>

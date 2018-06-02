@@ -220,7 +220,7 @@
                     console.log(data);
                     if(data.code == 200) {
                         layer.msg("修改成功,请在角色列表查看",{icon:6,time:2000},function(){
-                            //location.reload();
+//                            parent.location.reload();
                         });
                     } else if(data.code == 404){
                         window.location.href = "404.html";
