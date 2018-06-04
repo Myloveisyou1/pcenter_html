@@ -9,13 +9,19 @@
     <meta http-equiv="Cache-Control" content="no-siteapp" />
 
     <!-- 公共css+js -->
-    <script src="../static/js/common/base-css.js"></script>
-    <script src="../static/js/common/base-js.js"></script>
-    <script src="../static/js/common/base-code.js"></script>
+    <link rel='icon' href='static/images/logo.ico' type='image/x-icon'>
+    <link rel='stylesheet' href='static/css/font.css'/>
+    <link rel='stylesheet' href='static/css/xadmin.css'/>
+
+    <script type='text/javascript' src='static/lib/jquery.min.js'></script>
+    <script type='text/javascript' src='static/lib/layui/layui.js'></script>
+    <script type='text/javascript' src='static/js/xadmin.js'></script>
+    d<script type='text/javascript' src='static/lib/html5.min.js'></script>
+    <script type='text/javascript' src='static/lib/respond.min.js'></script>
+    <script src="static/js/common/base-code.js"></script>
 
 </head>
 <body class="login-bg">
-
 <div class="login layui-anim layui-anim-up">
     <div class="message">x-admin2.0-管理登录</div>
     <div id="darkbannerwrap"></div>
@@ -43,6 +49,7 @@
             layer.msg("密码不能为空",{icon:7});
             return;
         }
+        layer.load(2,{shade:0.3});
         $.ajax({
             url:URL+"login",
             type:"post",
@@ -52,6 +59,7 @@
                 password:userPassword
             },
             success:function(data){
+                layer.close("loading");
                 console.log(data);
                 if(data.code == 200) {
                     layer.msg("login success",{icon:6});
@@ -62,7 +70,7 @@
                     setCookie("SESSIONID",SESSIONID,1800*1000);
                     setCookie("MENU",MENU,1800*1000);
                     setCookie("USER",USER,1800*1000);
-                    window.location.href = "home.html";
+                    window.location.href = "html/home.html";
                 } else if(data.code == 404){
                     window.location.href = "404.html";
                 } else if(data.code == 500){

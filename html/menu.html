@@ -17,7 +17,7 @@
 
 <body>
 <div class="x-nav">
-      <span class="layui-breadcrumb">
+      <span class="layui-breadcrumb" lay-separator="-">
         <a href="">首页</a>
         <a href="">系统设置</a>
         <a>
@@ -58,6 +58,7 @@
     </table>
 </div>
 
+<!--添加菜单-->
 <div id="addMenu" style="display: none">
     <form class="layui-form">
         <div class="layui-form-item">
@@ -99,7 +100,7 @@
         </div>
     </form>
 </div>
-
+<!--图标列表-->
 <div id="iconList" style="display: none">
     <table class="layui-table layui-form" id="icon">
         <thead>
@@ -112,14 +113,38 @@
         </tbody>
     </table>
 </div>
+<!--子菜单列表-->
+<div style="display: none;" id="childMenuDiv">
+    <xblock>
+        <button class="layui-btn" onclick="addParent()"><i class="layui-icon"></i>添加</button>
+        <!--<span class="x-right" style="line-height:40px">共有数据：88 条</span>-->
+    </xblock>
+    <table class="layui-table layui-form" id="childMenu">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>菜单名称</th>
+            <th>菜单路径</th>
+            <th>菜单图标</th>
+            <th>所属项目</th>
+            <th>创建时间</th>
+            <th>修改时间</th>
+            <th>操作</th>
+        </thead>
+        <tbody class="x-cate" id="myChildMenu">
+
+        </tbody>
+    </table>
+</div>
 <script type="text/javascript" src="../static/js/common/base-code.js"></script>
 <script type="text/javascript" src="../static/js/common/basic.js"></script>
 <script>
-    var form = "",icon = "";
+    var form = "",icon = "",parentCode = "";
     layui.use('form', function(){
          form = layui.form;
 
     });
+
 
     $(function () {
         searchMenu();
@@ -163,6 +188,15 @@
                 } else {
                     layer.msg(data.msg,{icon:2});
                 }
+            },error:function(jqXHR, textStatus, errorThrown) {
+                var data = jqXHR.responseText;
+                if(jqXHR.status == 404){
+                    top.location.href = "404.html";
+                } else if(jqXHR.status == 500){
+                    top.location.href = "500.html";
+                } else {
+                    layer.msg(data.msg,{icon:2});
+                }
             }
         });
     }
@@ -190,10 +224,20 @@
 //                    $(html).appendTo("#menu_project")//添加下拉框的option
                     $("#menu_project").html(html);
                     form.render("select","selFilter");
+                    //layer.closeAll("loading");
                 } else if(data.code == 404){
                     window.location.href = "404.html";
                 } else if(data.code == 500){
                     window.location.href = "500.html";
+                } else {
+                    layer.msg(data.msg,{icon:2});
+                }
+            },error:function(jqXHR, textStatus, errorThrown) {
+                var data = jqXHR.responseText;
+                if(jqXHR.status == 404){
+                    top.location.href = "404.html";
+                } else if(jqXHR.status == 500){
+                    top.location.href = "500.html";
                 } else {
                     layer.msg(data.msg,{icon:2});
                 }
@@ -271,6 +315,15 @@
                     layer.msg(data.msg,{icon:2});
                 }
 
+            },error:function(jqXHR, textStatus, errorThrown) {
+                var data = jqXHR.responseText;
+                if(jqXHR.status == 404){
+                    top.location.href = "404.html";
+                } else if(jqXHR.status == 500){
+                    top.location.href = "500.html";
+                } else {
+                    layer.msg(data.msg,{icon:2});
+                }
             }
         });
 
@@ -281,8 +334,6 @@
      * 添加一级菜单
      * */
     function addParent() {
-
-        findAllProject();
 
         layer.open({
             type:1,
@@ -299,7 +350,7 @@
                     layer.msg("信息未填写完整",{icon:5});
                     return;
                 }
-
+                layer.load(2,{shade:0.3});
                 $.ajax({
                     url:URL+"menu/addMenu",
                     type:"get",
@@ -309,9 +360,11 @@
                         menuName:menu_name,
                         url:menu_url,
                         belong:$("#menu_project").val(),
-                        icon:icon
+                        icon:icon,
+                        parentCode:parentCode
                     },
                     success:function(data){
+                        layer.closeAll("loading");
                         console.log(data);
                         if(data.code == 200) {
                             layer.msg("添加成功,请在项目列表查看",{icon:6,time:2000},function(){
@@ -325,6 +378,15 @@
                             layer.msg(data.msg,{icon:2});
                         }
 
+                    },error:function(jqXHR, textStatus, errorThrown) {
+                        var data = jqXHR.responseText;
+                        if(jqXHR.status == 404){
+                            top.location.href = "404.html";
+                        } else if(jqXHR.status == 500){
+                            top.location.href = "500.html";
+                        } else {
+                            layer.msg(data.msg,{icon:2});
+                        }
                     }
                 });
             }
@@ -348,7 +410,7 @@
                     layer.msg("信息未填写完整",{icon:5});
                     return;
                 }
-
+                layer.load(2,{shade:0.3});
                 $.ajax({
                     url:URL+"project/addProject",
                     type:"get",
@@ -359,6 +421,7 @@
                         nameEn:nameEn
                     },
                     success:function(data){
+                        layer.closeAll("loading");
                         console.log(data);
                         if(data.code == 200) {
                             layer.msg("添加成功,请在项目列表查看",{icon:6,time:2000},function(){
@@ -372,6 +435,15 @@
                             layer.msg(data.msg,{icon:2});
                         }
 
+                    },error:function(jqXHR, textStatus, errorThrown) {
+                        var data = jqXHR.responseText;
+                        if(jqXHR.status == 404){
+                            top.location.href = "404.html";
+                        } else if(jqXHR.status == 500){
+                            top.location.href = "500.html";
+                        } else {
+                            layer.msg(data.msg,{icon:2});
+                        }
                     }
                 });
             }
@@ -379,20 +451,187 @@
     }
 
     function editMenu(id) {
+        layer.load(2,{shade:0.3});
+        //查询菜单信息
+        $.ajax({
+            url:URL+"menu/findById",
+            type:"get",
+            dataType:"json",
+            data:{
+                sessionId:SESSIONID,
+                id:id
+            },
+            success:function(data){
+                layer.closeAll("loading");
+                console.log(data);
+                if(data.code == 200) {
+                    $("#menu_name").val(data.data.menuName);
+                    $("#menu_url").val(data.data.url);
+                    $("#menu_icon").val(data.data.icon);
+//                    $("#menu_project option[value="+data.data.belong+"]").attr("selected",true);
+                    $("#menu_project").attr("option["+data.data.belong+"]");
+                    form.render("select","selFilter");
+                    layer.open({
+                        type:1,
+                        title: '编辑菜单',
+                        content: $("#addMenu"),
+                        area: ['400px', '500px'],
+                        btn:['修改','取消'],
+                        yes: function (index,layero) {
+                             var menu_name = $("#menu_name").val();
+                             var menu_url = $("#menu_url").val();
 
-        layer.msg("功能开发中...",{icon:5});
-        return;
+                             if(menu_name == "" || menu_url == "") {
+                                 layer.msg("信息未填写完整",{icon:5});
+                                    return;
+                             }
+
+                            //修改信息
+                             layer.load(2,{shade:0.3});
+                            $.ajax({
+                                url:URL+"menu/editMenu",
+                                type:"get",
+                                dataType:"json",
+                                data:{
+                                    sessionId:SESSIONID,
+                                    menuName:menu_name,
+                                    url:menu_url,
+                                    belong:$("#menu_project").val(),
+                                    icon:icon,
+                                    gid:id
+                                },
+                                success:function(data){
+                                    layer.closeAll("loading");
+                                    console.log(data);
+                                    if(data.code == 200) {
+                                        layer.msg("修改成功",{icon:6,time:2000},function(){
+                                            location.reload();
+                                        });
+                                    } else if(data.code == 404){
+                                        window.location.href = "404.html";
+                                    } else if(data.code == 500){
+                                        window.location.href = "500.html";
+                                    } else {
+                                        layer.msg(data.msg,{icon:2});
+                                    }
+                                },error:function(jqXHR, textStatus, errorThrown) {
+                                    var data = jqXHR.responseText;
+                                    if(jqXHR.status == 404){
+                                        top.location.href = "404.html";
+                                    } else if(jqXHR.status == 500){
+                                        top.location.href = "500.html";
+                                    } else {
+                                        layer.msg(data.msg,{icon:2});
+                                    }
+                                }
+                            });
+                        }
+                    });
+                } else if(data.code == 404){
+                    window.location.href = "404.html";
+                } else if(data.code == 500){
+                    window.location.href = "500.html";
+                } else {
+                    layer.msg(data.msg,{icon:2});
+                }
+            },error:function(jqXHR, textStatus, errorThrown) {
+                var data = jqXHR.responseText;
+                if(jqXHR.status == 404){
+                    top.location.href = "404.html";
+                } else if(jqXHR.status == 500){
+                    top.location.href = "500.html";
+                } else {
+                    layer.msg(data.msg,{icon:2});
+                }
+            }
+        });
     }
+
     function addChild(id) {
 
-        layer.msg("功能开发中...",{icon:5});
-        return;
+        //查询子菜单信息
+        parentCode = id;
+        searchChildMenu(id);
+        layer.open({
+            type:1,
+            title: '子菜单列表',
+            content: $("#childMenuDiv"),
+            area: ['1200px', '500px']
+        });
+    }
+
+    /**查询子菜单**/
+    function searchChildMenu(id) {
+
+        $.ajax({
+            url:URL+"menu/findChildMenu",
+            type:"get",
+            dataType:"json",
+            data:{
+                sessionId:SESSIONID,
+                parentCode:id
+            },
+            success:function(data){
+                console.log(data);
+                if(data.code == 200) {
+                    var data = data.data;
+                    console.log(data);
+                    var html = "";
+                    if (data != null && data.length > 0) {
+                        for(var i = 0;i < data.length;i++) {
+                            var a = "",b = "",d = "'编辑'"+",'role-add.html";
+                            if(data[i].status == 0) {
+                                a = '<span class="layui-btn layui-btn-normal layui-btn-mini">启用</span>';
+                                b = '<a onclick="role_stop('+data[i].gid+')" href="javascript:;"  title="启用"><i class="layui-icon">&#xe601;</i></a>';
+                            } else if(data[i].status == 1) {
+                                a = '<span class="layui-btn layui-btn-normal layui-btn-mini layui-btn-disabled">禁用</span>';
+                                b = '<a onclick="role_stop('+data[i].gid+')" href="javascript:;"  title="停用"><i class="layui-icon">&#xe62f;</i></a>';
+                            }
+                            var str = "";
+                            html += '<tr cate-id="'+data[i].gid+'" fid="'+data[i].parentCode+'" >' +
+                                    '<td>'+data[i].gid+'</td>' +
+                                    '<td>'+data[i].menuName+'</td>' +
+                                    '<td>'+data[i].url+'</td>' +
+                                    '<td><i class="iconfont">'+data[i].icon+'</i></td>' +
+                                    '<td>'+data[i].projectName+'</td>' +
+                                    '<td>'+data[i].createTime+'</td>' +
+                                    '<td>'+data[i].updateTime+'</td>'+
+                                    '<td class="td-manage">'+
+                                    '<button class="layui-btn layui-btn layui-btn-xs"  onclick="editMenu('+data[i].gid+')" ><i class="layui-icon">&#xe642;</i>编辑</button>'+
+                                    '<button class="layui-btn-danger layui-btn layui-btn-xs"  onclick="member_del('+data[i].gid+')" href="javascript:;" ><i class="layui-icon">&#xe640;</i>删除</button></td></tr>';
+
+                        }
+                    } else {
+                        html += '<tr><td colspan="100" align="center">暂无数据</td></tr>';
+                    }
+
+                    $("#myChildMenu").html(html);
+                } else if(data.code == 404){
+                    window.location.href = "404.html";
+                } else if(data.code == 500){
+                    window.location.href = "500.html";
+                } else {
+                    layer.msg(data.msg,{icon:2});
+                }
+
+            },error:function(jqXHR, textStatus, errorThrown) {
+                var data = jqXHR.responseText;
+                if(jqXHR.status == 404){
+                    top.location.href = "404.html";
+                } else if(jqXHR.status == 500){
+                    top.location.href = "500.html";
+                } else {
+                    layer.msg(data.msg,{icon:2});
+                }
+            }
+        });
+
     }
     /*用户-删除*/
     function member_del(id){
 
         layer.confirm('该菜单下的子类也会删除,确认要删除吗？',function(index){
-
+            layer.load(2,{shade:0.3});
             $.ajax({
                 url:URL+"menu/delMenu",
                 type:"get",
@@ -402,6 +641,7 @@
                     gid:id
                 },
                 success:function(data){
+                    layer.closeAll("loading");
                     console.log(data);
                     if(data.code == 200) {
                         layer.msg("删除成功,请在项目列表查看",{icon:6,time:2000},function(){
@@ -415,6 +655,15 @@
                         layer.msg(data.msg,{icon:2});
                     }
 
+                },error:function(jqXHR, textStatus, errorThrown) {
+                    var data = jqXHR.responseText;
+                    if(jqXHR.status == 404){
+                        top.location.href = "404.html";
+                    } else if(jqXHR.status == 500){
+                        top.location.href = "500.html";
+                    } else {
+                        layer.msg(data.msg,{icon:2});
+                    }
                 }
             });
         });
