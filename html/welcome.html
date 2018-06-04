@@ -12,8 +12,7 @@
     </head>
     <body>
     <div class="x-body layui-anim layui-anim-up">
-        <blockquote class="layui-elem-quote">欢迎管理员：
-            <span class="x-red">test</span>！当前时间:2018-04-25 20:50:53</blockquote>
+        <blockquote class="layui-elem-quote" id="userInfo"></blockquote>
         <fieldset class="layui-elem-field">
             <legend>数据统计</legend>
             <div class="layui-field-box">
@@ -27,28 +26,28 @@
                                             <a href="javascript:;" class="x-admin-backlog-body">
                                                 <h3>用户数</h3>
                                                 <p>
-                                                    <cite>66</cite></p>
+                                                    <cite id="userCount">66</cite></p>
                                             </a>
                                         </li>
                                         <li class="layui-col-xs3">
                                             <a href="javascript:;" class="x-admin-backlog-body">
                                                 <h3>邮件数</h3>
                                                 <p>
-                                                    <cite>12</cite></p>
+                                                    <cite id="emailCount">12</cite></p>
                                             </a>
                                         </li>
                                         <li class="layui-col-xs3">
                                             <a href="javascript:;" class="x-admin-backlog-body">
                                                 <h3>商品数</h3>
                                                 <p>
-                                                    <cite>99</cite></p>
+                                                    <cite id="goodsCount">99</cite></p>
                                             </a>
                                         </li>
                                         <li class="layui-col-xs3">
                                             <a href="javascript:;" class="x-admin-backlog-body">
                                                 <h3>工资总额</h3>
                                                 <p>
-                                                    <cite>$12000</cite></p>
+                                                    <cite id="salaryCount">$12000</cite></p>
                                             </a>
                                         </li>
                                     </ul>
@@ -60,25 +59,16 @@
             </div>
         </fieldset>
         <fieldset class="layui-elem-field">
-            <legend>系统通知</legend>
+            <legend>版本信息</legend>
             <div class="layui-field-box">
-                <table class="layui-table" lay-skin="line">
-                    <tbody>
-                        <tr>
-                            <td >
-                                <a class="x-a" href="/" target="_blank">新版x-admin 2.0上线了</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td >
-                                <a class="x-a" href="/" target="_blank">交流qq群:(519492808)</a>
-                            </td>
-                        </tr>
+                <table class="layui-table">
+                    <tbody id="version">
+
                     </tbody>
                 </table>
             </div>
         </fieldset>
-        <fieldset class="layui-elem-field">
+       <!-- <fieldset class="layui-elem-field">
             <legend>系统信息</legend>
             <div class="layui-field-box">
                 <table class="layui-table">
@@ -119,7 +109,7 @@
                     </tbody>
                 </table>
             </div>
-        </fieldset>
+        </fieldset>-->
         <fieldset class="layui-elem-field">
             <legend>开发团队</legend>
             <div class="layui-field-box">
@@ -127,8 +117,8 @@
                     <tbody>
                         <tr>
                             <th>版权所有</th>
-                            <td>xxxxx(xxxx)
-                                <a href="http://www.xxx.com/" class='x-a' target="_blank">访问官网</a></td>
+                            <td>http://dev.69memory.club/
+                                <a href="http://dev.69memory.club/" class='x-a' target="_blank">访问官网</a></td>
                         </tr>
                         <tr>
                             <th>开发者</th>
@@ -139,5 +129,123 @@
         </fieldset>
         <blockquote class="layui-elem-quote layui-quote-nm">感谢layui,百度Echarts,jquery,本系统由x-admin马志斌提供技术支持。</blockquote>
     </div>
+
+    <script type="text/javascript" src="../static/js/common/base-code.js"></script>
+    <script type="text/javascript" src="../static/js/common/basic.js"></script>
+    <script>
+        function mytime(){
+            var a = new Date();
+            var b = a.toLocaleTimeString();
+            var c = a.toLocaleDateString();
+            document.getElementById("timel").innerHTML = "当前时间:"+c+"&nbsp"+b;
+        }
+        setInterval(function() {mytime()},1000);
+        
+        $(function () {
+            var roleName = USER.roleName;
+            var userName = USER.userName;
+            $("#userInfo").html('欢迎'+roleName+':<span class="x-red">'+userName+'</span>&nbsp;&nbsp;&nbsp;<span id="timel"></span>');
+            findBasicInfo();
+            findSysVersion();
+        })
+
+
+        function findBasicInfo() {
+
+            $.ajax({
+                url:URL+"home/findBasicInfo",
+                type:"get",
+                dataType:"json",
+                data:{
+                    sessionId:SESSIONID
+                },
+                success:function(data){
+                    console.log(data);
+                    if(data.code == 200) {
+                        var data = data.data;
+                        console.log(data);
+                        $("#userCount").html(data.userCount);
+                        $("#emailCount").html(data.emailCount);
+                        $("#goodsCount").html(data.goodsCount);
+                        $("#salaryCount").html(data.salaryCount);
+
+                        //更新记录
+
+                    } else if (data.code == 209){
+                        layer.msg(data.msg,{icon:2});
+                        top.location.href = "../login.html";
+                    } else {
+                        layer.msg(data.msg,{icon:2});
+                    }
+
+                },error:function(jqXHR, textStatus, errorThrown) {
+                    var data = jqXHR.responseText;
+                    if(jqXHR.status == 404){
+                        top.location.href = "404.html";
+                    } else if(jqXHR.status == 500){
+                        top.location.href = "500.html";
+                    } else {
+                        layer.msg(data.msg,{icon:2});
+                    }
+                }
+            });
+        }
+
+        function findSysVersion() {
+
+            $.ajax({
+                url:URL+"sys/findSysVersion",
+                type:"get",
+                dataType:"json",
+                data:{
+                    sessionId:SESSIONID
+                },
+                success:function(data){
+                    console.log(data);
+                    if(data.code == 200) {
+                        var data = data.data;
+                        console.log(data);
+                        var html = "";
+                        if (data != null && data.length > 0) {
+                            for(var i=0;i<data.length;i++) {
+                                if(i == data.length-1) {
+                                    html += '<tr>' +
+                                            '<th>更新内容</th>' +
+                                            '<td>'+data[i].msg+'</td>' +
+                                            '</tr>' +
+                                            '<tr>' +
+                                            '<th>版本信息</th>' +
+                                            '<td>'+data[i].version+'</td>' +
+                                            '</tr>' +
+                                            '<tr>' +
+                                            '<th>更新时间</th>' +
+                                            '<td>'+data[i].updateTime+'</td>' +
+                                            '</tr>';
+                                }
+
+                            }
+                        }
+                        $("#version").html(html);
+
+                    } else if (data.code == 209){
+                        layer.msg(data.msg,{icon:2});
+                        top.location.href = "../login.html";
+                    } else {
+                        layer.msg(data.msg,{icon:2});
+                    }
+
+                },error:function(jqXHR, textStatus, errorThrown) {
+                    var data = jqXHR.responseText;
+                    if(jqXHR.status == 404){
+                        top.location.href = "404.html";
+                    } else if(jqXHR.status == 500){
+                        top.location.href = "500.html";
+                    } else {
+                        layer.msg(data.msg,{icon:2});
+                    }
+                }
+            });
+        }
+    </script>
     </body>
 </html>
