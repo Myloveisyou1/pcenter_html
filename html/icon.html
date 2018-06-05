@@ -77,9 +77,14 @@
 <script type="text/javascript" src="../static/js/common/basic.js"></script>
 
 <script>
-    
+    var layer = "";
+    layui.use(['layer'],function(){
+        layer = layui.layer;
+    });
     $(function () {
+        parent.layer.load(2,{shade:0.3});
         findIconList();
+        parent.layer.closeAll("loading");
     });
 
     function addIcon() {
@@ -171,10 +176,9 @@
                         html += '<tr><td colspan="100" align="center">暂无数据</td></tr>';
                     }
                     $("#myTable").html(html);
-                } else if(data.code == 404){
-                    window.location.href = "404.html";
-                } else if(data.code == 500){
-                    window.location.href = "500.html";
+                } else if(data.code == 209){
+                    layer.msg(data.msg,{icon:2});
+                    window.location.href = "../login.html";
                 } else {
                     layer.msg(data.msg,{icon:2});
                 }
@@ -188,6 +192,7 @@
                     layer.msg(data.msg,{icon:2});
                 }
             }
+
         });
     }
 </script>

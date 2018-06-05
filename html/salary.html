@@ -27,12 +27,479 @@
         <i class="layui-icon" style="line-height:30px">ဂ</i></a>
 </div>
 <div class="x-body">
-    功能开发中...
-</div>
+    <div class="layui-row">
+        <form class="layui-form layui-col-md12 x-so">
+            <div class="layui-input-inline">
+                <select name="cateid" id="salaryType">
+                    <option value="-1">全部</option>
+                    <option value="0">生活</option>
+                    <option value="1">工作</option>
+                </select>
+            </div>
+            <div class="layui-input-inline">
+                <select name="cateid" id="status">
+                    <option value="-1">全部</option>
+                    <option value="0">启用</option>
+                    <option value="1">禁用</option>
+                </select>
+            </div>
+            <div class="layui-input-inline" style="margin-top: 2px;">
+                <input type="text" id="salaryName"  placeholder="请输入名称" autocomplete="off" class="layui-input">
+            </div>
+            <button type="button" class="layui-btn"  lay-submit="" lay-filter="sreach"><i class="layui-icon" onclick="findSalaryType()">&#xe615;</i></button>
 
+        </form>
+    </div>
+    <xblock>
+        <!--<button class="layui-btn layui-btn-danger" onclick="delAll()"><i class="layui-icon"></i>批量删除</button>-->
+        <button class="layui-btn" onclick="addSalaryType()"><i class="layui-icon"></i>添加</button>
+        <span class="x-right" style="line-height:40px" id="totalCount"></span>
+    </xblock>
+    <table class="layui-table layui-form">
+        <thead>
+        <tr>
+            <th>
+                <div class="layui-unselect header layui-form-checkbox" lay-skin="primary"><i class="layui-icon">&#xe605;</i></div>
+            </th>
+            <th>ID</th>
+            <th>配置类型</th>
+            <th>配置名称</th>
+            <th>操作方式</th>
+            <th>结算方式</th>
+            <th>结算值</th>
+            <th>创建时间</th>
+            <th>修改时间</th>
+            <th>状态</th>
+            <th>操作</th>
+        </thead>
+        <tbody class="x-cate" id="myTable">
+
+        </tbody>
+    </table>
+</div>
+<!--添加配置-->
+<div id="addSalary" style="display: none">
+    <form class="layui-form">
+        <div class="layui-form-item">
+            <label for="salary_name" class="layui-form-label">
+                <span class="x-red">*</span>配置名称
+            </label>
+            <div class="layui-input-inline">
+                <input type="text" id="salary_name" required="" lay-verify="pass"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="salary_type" class="layui-form-label">
+                <span class="x-red">*</span>配置类型
+            </label>
+            <div class="layui-input-inline layui-form" lay-filter="selFilter">
+                <select name="salary_type" id="salary_type" lay-verify="required">
+                    <option value="0">生活</option>
+                    <option value="1">工作</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="deductions_way" class="layui-form-label">
+                <span class="x-red">*</span>操作方式
+            </label>
+            <div class="layui-input-inline layui-form" lay-filter="selFilter">
+                <select name="salary_type" id="deductions_way" lay-verify="required">
+                    <option value="0">现金</option>
+                    <option value="1">百分比</option>
+                </select>
+                <p class="x-red">现金:扣费值对应单位是分</p>
+                <p class="x-red">百分比:扣费值时不带%</p>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="operation_type" class="layui-form-label">
+                <span class="x-red">*</span>结算方式
+            </label>
+            <div class="layui-input-inline layui-form" lay-filter="selFilter">
+                <select name="salary_type" id="operation_type" lay-verify="required">
+                    <option value="0">扣钱</option>
+                    <option value="1">加钱</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="deductions_value" class="layui-form-label">
+                <span class="x-red">*</span>扣费值
+            </label>
+            <div class="layui-input-inline">
+                <input type="text" id="deductions_value" required="" lay-verify="pass"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+    </form>
+</div>
 
 <script type="text/javascript" src="../static/js/common/base-code.js"></script>
 <script type="text/javascript" src="../static/js/common/basic.js"></script>
+
+<script>
+    var form = "",layer = "";
+    layui.use('form', function(){
+        form = layui.form;
+    });
+    layui.use(['layer'],function(){
+        layer = layui.layer;
+    });
+    $(function () {
+        findSalaryType();
+    });
+    /**
+     * 查询薪资配置
+     * */
+    function findSalaryType() {
+        var salaryName = $("#salaryName").val();
+        var salaryType = $("#salaryType").val();
+        var status = $("#status").val();
+        parent.layer.load(2,{shade:0.3});
+        $.ajax({
+            url:URL+"salary/findSalaryType",
+            type:"get",
+            dataType:"json",
+            data:{
+                sessionId:SESSIONID,
+                sType:salaryType,
+                sName:salaryName,
+                status:status
+            },
+            success:function(data){
+                parent.layer.closeAll("loading");
+                console.log(data);
+                if(data.code == 200) {
+                    var data = data.data;
+                    var html = "";
+                    if (data != null && data.length > 0) {
+                        for(var i=0;i<data.length;i++) {
+                            var stype = "",status = "",sdeductionsType = "",soperationType = "",sdeductionsValue = "",color = "";
+                            if(data[i].stype == 0) {
+                                stype = "生活";
+                            } else {
+                                stype = "工作";
+                            }
+                            if(data[i].sdeductionsType == 0) {
+                                sdeductionsType = "现金";
+                                sdeductionsValue = data[i].sdeductionsValue;
+                            } else {
+                                sdeductionsType = "百分比";
+                                sdeductionsValue = data[i].sdeductionsValue+"%";
+                            }
+                            if(data[i].soperationType == 0) {
+                                soperationType = "扣钱";
+                                color = "color:red";
+                            } else {
+                                soperationType = "加钱";
+                                color = "color:green";
+                            }
+                            var a = "",b = "";
+                            if(data[i].status == 0) {
+                                a = '<span class="layui-btn layui-btn-normal layui-btn-mini">启用</span>';
+                                b = '<button class="layui-btn layui-btn layui-btn-xs"  onclick="role_stop('+data[i].gid+',1)" ><i class="layui-icon">&#xe642;</i>禁用</button>';
+                            } else if(data[i].status == 1) {
+                                a = '<span class="layui-btn layui-btn-normal layui-btn-mini layui-btn-disabled">禁用</span>';
+                                b = '<button class="layui-btn layui-btn layui-btn-xs"  onclick="role_stop('+data[i].gid+',0)" ><i class="layui-icon">&#xe642;</i>启用</button>';
+                            }
+
+                            html += '<tr><td><div class="layui-unselect header layui-form-checkbox" lay-skin="primary"><i class="layui-icon">&#xe605;</i></div></td>' +
+                                    '<td>'+(i+1)+'</td>' +
+                                    '<td>'+stype+'</td>' +
+                                    '<td>'+data[i].sname+'</td>' +
+                                    '<td>'+sdeductionsType+'</td>' +
+                                    '<td style="'+color+'">'+soperationType+'</td>' +
+                                    '<td style="'+color+'">'+sdeductionsValue+'</td>' +
+                                    '<td>'+data[i].createTime+'</td>' +
+                                    '<td>'+data[i].updateTime+'</td>' +
+                                    '<td class="td-status">'+a+'</td>' +
+                                    '<td class="td-manage">' +b+
+                                    '<button class="layui-btn layui-btn layui-btn-xs"  onclick="editMenu('+data[i].gid+')" ><i class="layui-icon">&#xe642;</i>编辑</button>'+
+                                    '<button class="layui-btn-danger layui-btn layui-btn-xs"  onclick="member_del('+data[i].gid+')" href="javascript:;" ><i class="layui-icon">&#xe640;</i>删除</button>' +
+                                    '</td></tr>';
+                        }
+                    } else {
+                        html = '<tr><td colspan="100" align="center">暂无数据</td>';
+                    }
+
+                    $("#myTable").html(html);
+                } else if(data.code == 209){
+                    window.location.href = "./login.html";
+                } else {
+                    layer.msg(data.msg,{icon:2});
+                }
+
+            },error:function(jqXHR, textStatus, errorThrown) {
+                var data = jqXHR.responseText;
+                if(jqXHR.status == 404){
+                    top.location.href = "404.html";
+                } else if(jqXHR.status == 500){
+                    top.location.href = "500.html";
+                } else {
+                    layer.msg(data.msg,{icon:2});
+                }
+            }
+        });
+
+    }
+    /**
+     * 添加薪资配置
+     */
+    function addSalaryType() {
+
+        layer.open({
+            type:1,
+            title: '添加薪资配置',
+            content: $("#addSalary"),
+            area: ['400px', '500px'],
+            btn:['添加','取消'],
+            yes: function (index,layero) {
+
+                var salary_name = $("#salary_name").val();
+                var salary_type = $("#salary_type").val();
+                var deductions_way = $("#deductions_way").val();
+                var deductions_value = $("#deductions_value").val();
+                var operation_type = $("#operation_type").val();
+
+                if(salary_name == "" || deductions_value == "") {
+                    layer.msg("信息未填写完整",{icon:5});
+                    return;
+                }
+                layer.load(2,{shade:0.3});
+                $.ajax({
+                    url:URL+"salary/addSalaryType",
+                    type:"get",
+                    dataType:"json",
+                    data:{
+                        sessionId:SESSIONID,
+                        sType:salary_type,
+                        sName:salary_name,
+                        sDeductionsType:deductions_way,
+                        sDeductionsValue:deductions_value,
+                        sOperationType:operation_type
+                    },
+                    success:function(data){
+                        layer.closeAll("loading");
+                        console.log(data);
+                        if(data.code == 200) {
+                            layer.msg("添加成功,请在列表查看",{icon:6,time:2000},function(){
+                                layer.closeAll("page");
+                                findSalaryType();
+                            });
+                        } else if(data.code == 209){
+                            window.location.href = "./login.html";
+                        } else {
+                            layer.msg(data.msg,{icon:2});
+                        }
+
+                    },error:function(jqXHR, textStatus, errorThrown) {
+                        var data = jqXHR.responseText;
+                        if(jqXHR.status == 404){
+                            top.location.href = "404.html";
+                        } else if(jqXHR.status == 500){
+                            top.location.href = "500.html";
+                        } else {
+                            layer.msg(data.msg,{icon:2});
+                        }
+                    }
+                });
+            }
+        });
+    }
+    /**
+     * 删除薪资配置
+     * @param gid
+     */
+    function member_del(gid) {
+        layer.confirm('删除不可恢复,确认要删除吗？',function(index){
+            layer.load(2,{shade:0.3});
+            $.ajax({
+                url:URL+"salary/delSalaryType",
+                type:"get",
+                dataType:"json",
+                data:{
+                    sessionId:SESSIONID,
+                    gid:gid
+                },
+                success:function(data){
+                    layer.closeAll("loading");
+                    console.log(data);
+
+                    if(data.code == 200) {
+                        layer.msg(data.msg,{icon:6});
+                        findSalaryType();
+                    } else if(data.code == 209){
+                        layer.msg(data.msg,{icon:6});
+                        window.location.href = "./login.html";
+                    } else {
+                        layer.msg(data.msg,{icon:2});
+                    }
+
+                },error:function(jqXHR, textStatus, errorThrown) {
+                    var data = jqXHR.responseText;
+                    if(jqXHR.status == 404){
+                        top.location.href = "404.html";
+                    } else if(jqXHR.status == 500){
+                        top.location.href = "500.html";
+                    } else {
+                        layer.msg(data.msg,{icon:2});
+                    }
+                }
+            });
+        })
+    }
+    /**
+     * 编辑薪资配置
+     * @param gid
+     */
+    function editMenu(gid) {
+        layer.load(2,{shade:0.3});
+        $.ajax({
+            url:URL+"salary/findById",
+            type:"get",
+            dataType:"json",
+            data:{
+                sessionId:SESSIONID,
+                gid:gid
+            },
+            success:function(data){
+                layer.closeAll("loading");
+                console.log(data);
+                if(data.code == 200) {
+                    $("#salary_name").val(data.data.sname);
+                    $("#deductions_value").val(data.data.sdeductionsValue);
+                    $("#operation_type").find("option[value='"+data.data.soperationType+"']").attr("selected",true);
+                    $("#deductions_way").find("option[value='"+data.data.sdeductionsType+"']").attr("selected",true);
+                    $("#salary_type").find("option[value='"+data.data.stype+"']").attr("selected",true);
+                    form.render("select","selFilter");
+                } else if(data.code == 209){
+                    window.location.href = "./login.html";
+                } else {
+                    layer.msg(data.msg,{icon:2});
+                }
+
+            },error:function(jqXHR, textStatus, errorThrown) {
+                var data = jqXHR.responseText;
+                if(jqXHR.status == 404){
+                    top.location.href = "404.html";
+                } else if(jqXHR.status == 500){
+                    top.location.href = "500.html";
+                } else {
+                    layer.msg(data.msg,{icon:2});
+                }
+            }
+        });
+        layer.open({
+            type:1,
+            title: '编辑薪资配置',
+            content: $("#addSalary"),
+            area: ['400px', '500px'],
+            btn:['编辑','取消'],
+            yes: function (index,layero) {
+
+                var salary_name = $("#salary_name").val();
+                var salary_type = $("#salary_type").val();
+                var deductions_way = $("#deductions_way").val();
+                var deductions_value = $("#deductions_value").val();
+                var operation_type = $("#operation_type").val();
+
+                if(salary_name == "" || deductions_value == "") {
+                    layer.msg("信息未填写完整",{icon:5});
+                    return;
+                }
+                layer.load(2,{shade:0.3});
+                $.ajax({
+                    url:URL+"salary/updateSalaryType",
+                    type:"get",
+                    dataType:"json",
+                    data:{
+                        sessionId:SESSIONID,
+                        gid:gid,
+                        sType:salary_type,
+                        sName:salary_name,
+                        sDeductionsType:deductions_way,
+                        sDeductionsValue:deductions_value,
+                        sOperationType:operation_type
+                    },
+                    success:function(data){
+                        layer.closeAll("loading");
+                        console.log(data);
+                        if(data.code == 200) {
+                            layer.msg("编辑成功,请在列表查看",{icon:6,time:2000},function(){
+                                layer.closeAll("page");
+                                findSalaryType();
+                            });
+                        } else if(data.code == 209){
+                            window.location.href = "./login.html";
+                        } else {
+                            layer.msg(data.msg,{icon:2});
+                        }
+
+                    },error:function(jqXHR, textStatus, errorThrown) {
+                        var data = jqXHR.responseText;
+                        if(jqXHR.status == 404){
+                            top.location.href = "404.html";
+                        } else if(jqXHR.status == 500){
+                            top.location.href = "500.html";
+                        } else {
+                            layer.msg(data.msg,{icon:2});
+                        }
+                    }
+                });
+            }
+        });
+    }
+    /**
+     * 启用禁用
+     * @param gid
+     * @param type
+     */
+    function role_stop(gid,type){
+
+        var tishi = type == 0?"启用":"禁用";
+        layer.confirm('确认要'+tishi+'吗？',function(index){
+
+            if (index) {
+                layer.load(2,{shade:0.3});
+                $.ajax({
+                    url:URL+"salary/updateSalaryType",
+                    type:"get",
+                    dataType:"json",
+                    data:{
+                        sessionId:SESSIONID,
+                        gid:gid,
+                        status:type
+                    },
+                    success:function(data){
+                        console.log(data);
+                        layer.closeAll("loading");
+                        if(data.code == 200) {
+                            layer.msg(tishi+"成功",{icon:6});
+                            location.reload();
+                        } else if(data.code == 209){
+                            window.location.href = "./login.html";
+                        } else {
+                            layer.msg(data.msg,{icon:2});
+                        }
+
+                    },error:function(jqXHR, textStatus, errorThrown) {
+                        var data = jqXHR.responseText;
+                        if(jqXHR.status == 404){
+                            top.location.href = "404.html";
+                        } else if(jqXHR.status == 500){
+                            top.location.href = "500.html";
+                        } else {
+                            layer.msg(data.msg,{icon:2});
+                        }
+                    }
+                });
+            }
+
+        });
+    }
+</script>
 </body>
 
 </html>

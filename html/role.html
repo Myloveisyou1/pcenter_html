@@ -59,8 +59,15 @@
 <script type="text/javascript" src="../static/js/common/base-code.js"></script>
 <script type="text/javascript" src="../static/js/common/basic.js"></script>
 <script>
+    var layer = "";
+    layui.use(['layer'],function(){
+        layer = layui.layer;
+    });
+
     $(function () {
+        parent.layer.load(2,{shade:0.3});
         findAllRole();
+        parent.layer.closeAll("loading");
     });
 
     /*角色-停用*/

@@ -72,8 +72,13 @@
             elem: '#end' //指定元素
         });
     });
+    var layer = "";
+    layui.use(['layer'],function(){
+        layer = layui.layer;
+    });
 
     $(function () {
+        parent.layer.load(2,{shade:0.3});
         layui.use('table', function(){
             var table = layui.table;
 
@@ -121,6 +126,7 @@
             });
 
         });
+        parent.layer.closeAll("loading");
     })
 
     function queryLogs() {

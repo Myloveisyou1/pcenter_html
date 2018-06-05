@@ -77,9 +77,12 @@
 <script type="text/javascript" src="../static/js/common/base-code.js"></script>
 <script type="text/javascript" src="../static/js/common/basic.js"></script>
 <script>
-    var userName = "",roleId = "";
+    var userName = "",roleId = "",layer = "";
+    layui.use(['layer'],function(){
+        layer = layui.layer;
+    });
     $(function () {
-
+        parent.layer.load(2,{shade:0.3});
         //获取参数
         userName= getRequest().userName;
         roleId= getRequest().roleId;
@@ -93,6 +96,7 @@
             }
         }
         findAllRole();
+        parent.layer.closeAll("loading");
     });
 
     /**

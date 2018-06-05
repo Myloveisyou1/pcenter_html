@@ -56,8 +56,13 @@
 <script type="text/javascript" src="../static/js/common/base-code.js"></script>
 <script type="text/javascript" src="../static/js/common/basic.js"></script>
 <script>
-    var roleName = "",roleId = "",roleNameEn = "",menusList = "";
+    var roleName = "",roleId = "",roleNameEn = "",menusList = "",layer = "";
+    layui.use(['layer'],function(){
+        layer = layui.layer;
+    });
+
     $(function () {
+        parent.layer.load(2,{shade:0.3});
         findAllMenu();
         //获取参数
         roleName= getRequest().roleName;
@@ -71,7 +76,7 @@
                 findRoleMenu(roleId);
             }
         }
-
+        parent.layer.closeAll("loading");
 
     })
 

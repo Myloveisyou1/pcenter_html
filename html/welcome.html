@@ -133,6 +133,7 @@
     <script type="text/javascript" src="../static/js/common/base-code.js"></script>
     <script type="text/javascript" src="../static/js/common/basic.js"></script>
     <script>
+        var layer = "";
         function mytime(){
             var a = new Date();
             var b = a.toLocaleTimeString();
@@ -140,13 +141,18 @@
             document.getElementById("timel").innerHTML = "当前时间:"+c+"&nbsp"+b;
         }
         setInterval(function() {mytime()},1000);
-        
+
+        layui.use(['layer'],function(){
+            layer = layui.layer;
+        })
         $(function () {
+            layer.load(2,{shade:0.3});
             var roleName = USER.roleName;
             var userName = USER.userName;
             $("#userInfo").html('欢迎'+roleName+':<span class="x-red">'+userName+'</span>&nbsp;&nbsp;&nbsp;<span id="timel"></span>');
             findBasicInfo();
             findSysVersion();
+            layer.closeAll("loading");
         })
 
 

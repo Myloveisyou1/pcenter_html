@@ -80,15 +80,19 @@
 <script type="text/javascript" src="../static/js/common/base-code.js"></script>
 <script type="text/javascript" src="../static/js/common/basic.js"></script>
 <script>
-    var form = "",icon = "",parentCode = "";
+    var form = "",icon = "",parentCode = "",layer = "";
     layui.use('form', function(){
         form = layui.form;
-
+    });
+    layui.use(['layer'],function(){
+        layer = layui.layer;
     });
 
 
     $(function () {
+        parent.layer.load(2,{shade:0.3});
         searchVersion();
+        parent.layer.closeAll("loading");
     });
 
     function searchVersion() {

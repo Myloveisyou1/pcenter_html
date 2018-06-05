@@ -16,14 +16,14 @@
     <script type='text/javascript' src='static/lib/jquery.min.js'></script>
     <script type='text/javascript' src='static/lib/layui/layui.js'></script>
     <script type='text/javascript' src='static/js/xadmin.js'></script>
-    d<script type='text/javascript' src='static/lib/html5.min.js'></script>
+    <script type='text/javascript' src='static/lib/html5.min.js'></script>
     <script type='text/javascript' src='static/lib/respond.min.js'></script>
     <script src="static/js/common/base-code.js"></script>
 
 </head>
 <body class="login-bg">
 <div class="login layui-anim layui-anim-up">
-    <div class="message">x-admin2.0-管理登录</div>
+    <div class="message">个人中心管理登录</div>
     <div id="darkbannerwrap"></div>
 
     <!--<form method="post" class="layui-form" action="#">-->
@@ -59,7 +59,7 @@
                 password:userPassword
             },
             success:function(data){
-                layer.close("loading");
+                layer.closeAll("loading");
                 console.log(data);
                 if(data.code == 200) {
                     layer.msg("login success",{icon:6});
@@ -75,6 +75,7 @@
                     layer.msg(data.msg,{icon:5});
                 }
             },error:function(jqXHR, textStatus, errorThrown) {
+                layer.closeAll("loading");
                 var data = jqXHR.responseText;
                 if(jqXHR.status == 404){
                     top.location.href = "404.html";
@@ -85,10 +86,7 @@
                 }
             }
         });
-
-
     }
-
 </script>
 </body>
 </html>
