@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>工资配置</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+
+
+    <!-- 公共css+js -->
+    <script src="../static/js/common/base-css.js"></script>
+    <script src="../static/js/common/base-js.js"></script>
+
+</head>
+
+<body>
+<div class="x-nav">
+      <span class="layui-breadcrumb" lay-separator="-">
+        <a href="">首页</a>
+        <a href="">系统设置</a>
+        <a>
+            <cite>工资配置</cite></a>
+      </span>
+    <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" href="javascript:location.replace(location.href);" title="刷新">
+        <i class="layui-icon" style="line-height:30px">ဂ</i></a>
+</div>
+<div class="x-body">
+    <div class="layui-row">
+        <form class="layui-form layui-col-md12 x-so">
+            <div class="layui-input-inline" style="margin-top: -1px;">
+                <select name="cateid" id="consumeType">
+                    <option value="-1">全部</option>
+                    <option value="1">餐饮</option>
+                    <option value="2">通讯</option>
+                    <option value="3">交通</option>
+                    <option value="4">娱乐</option>
+                    <option value="5">生活用品</option>
+                </select>
+            </div>
+            <div class="layui-input-inline">
+                <input class="layui-input" placeholder="开始日" name="start" id="start">
+                <input class="layui-input" placeholder="截止日" name="end" id="end">
+            </div>
+            <button type="button" class="layui-btn"  lay-submit="" lay-filter="sreach"><i class="layui-icon" onclick="findConsume(1)">&#xe615;</i></button>
+
+        </form>
+    </div>
+    <xblock>
+        <button class="layui-btn" onclick="addConsume()"><i class="layui-icon"></i>添加</button>
+        <span class="x-right" style="line-height:40px" id="totalCount"></span>
+    </xblock>
+    <table class="layui-table layui-form" id="demo">
+        <thead>
+        <tr>
+            <th>
+                <div class="layui-unselect header layui-form-checkbox" lay-skin="primary"><i class="layui-icon">&#xe605;</i></div>
+            </th>
+            <th>ID</th>
+            <th>消费类型</th>
+            <th>消费金额</th>
+            <th>消费备注</th>
+            <th>消费时间</th>
+        </thead>
+        <tbody class="x-cate" id="myTable">
+
+        </tbody>
+    </table>
+    <div class="layui-table-page" style="width: auto;">
+        <div id="layui-table-page1">
+            <div class="layui-box layui-laypage layui-laypage-default" id="page">
+
+            </div>
+        </div>
+    </div>
+</div>
+<!--添加消费记录-->
+<div id="addSalary" style="display: none">
+    <form class="layui-form">
+        <div class="layui-form-item">
+            <label for="consume_type" class="layui-form-label">
+                <span class="x-red">*</span>消费类型
+            </label>
+            <div class="layui-input-inline layui-form" lay-filter="selFilter">
+                <select name="consume_type" id="consume_type" lay-verify="required">
+                    <option value="1">餐饮</option>
+                    <option value="2">通讯</option>
+                    <option value="3">交通</option>
+                    <option value="4">娱乐</option>
+                    <option value="5">生活用品</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="consume_money" class="layui-form-label">
+                <span class="x-red">*</span>消费金额
+            </label>
+            <div class="layui-input-inline">
+                <input type="text" id="consume_money" required="" lay-verify="pass"
+                       autocomplete="off" class="layui-input" placeholder="单位是分">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="consume_remark" class="layui-form-label">
+                <span class="x-red">*</span>消费备注
+            </label>
+            <div class="layui-input-inline">
+                <textarea type="text" id="consume_remark" required="" lay-verify="pass"
+                          autocomplete="off" class="layui-input"></textarea>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript" src="../static/js/common/base-code.js"></script>
+<script type="text/javascript" src="../static/js/common/basic.js"></script>
+
+<script>
+    var form = "",layer = "";
+    layui.use('form', function(){
+        form = layui.form;
+    });
+    layui.use(['layer'],function(){
+        layer = layui.layer;
+    });
+    layui.use('laydate', function(){
+        var laydate = layui.laydate;
+        //执行一个laydate实例
+        laydate.render({
+            elem: '#start' //指定元素
+        });
+        //执行一个laydate实例
+        laydate.render({
+            elem: '#end' //指定元素
+        });
+    });
+    $(function () {
+        findConsume(1);
+    });
+    /**
+     * 查询消费记录
+     * */
+    function findConsume(pageNum) {
+        var consumeType = $("#consumeType").val();
+        var start = $("#start").val();
+        var end = $("#end").val();
+        parent.layer.load(2,{shade:0.3});
+        $.ajax({
+            url:URL+"consume/findConsume",
+            type:"get",
+            dataType:"json",
+            data:{
+                sessionId:SESSIONID,
+                consumeType:consumeType,
+                start:start,
+                end:end,
+                pageNum:parseInt(pageNum),
+                pageSize:10
+            },
+            success:function(data){
+                parent.layer.closeAll("loading");
+                console.log(data);
+                if(data.code == 200) {
+                    var ret = data.data;
+                    var data = ret.list;
+                    var page = ret.page;
+                    var html = "";
+                    if (data != null && data.length > 0) {
+                        for(var i=0;i<data.length;i++) {
+                            html += '<tr><td><div class="layui-unselect header layui-form-checkbox" lay-skin="primary"><i class="layui-icon">&#xe605;</i></div></td>' +
+                                    '<td>'+(i+1)+'</td>' +
+                                    '<td>'+data[i].consumeTypeName+'</td>' +
+                                    '<td>￥'+(data[i].consumeMoney/100).toFixed(2)+'</td>' +
+                                    '<td>'+data[i].consumeRemark+'</td>' +
+                                    '<td>'+data[i].createTime+'</td></tr>';
+                        }
+                    } else {
+                        html = '<tr><td colspan="100" align="center">暂无数据</td>';
+                    }
+                    $("#myTable").html(html);
+                    //处理分页数据
+                    pagesUtils(page,"findConsume");
+                } else if(data.code == 209){
+                    window.location.href = "./login.html";
+                } else {
+                    layer.msg(data.msg,{icon:2});
+                }
+
+            },error:function(jqXHR, textStatus, errorThrown) {
+                var data = jqXHR.responseText;
+                if(jqXHR.status == 404){
+                    top.location.href = "404.html";
+                } else if(jqXHR.status == 500){
+                    top.location.href = "500.html";
+                } else {
+                    layer.msg(data.msg,{icon:2});
+                }
+            }
+        });
+
+    }
+    /**
+     * 添加消费记录
+     */
+    function addConsume() {
+
+        layer.open({
+            type:1,
+            title: '添加消费记录',
+            content: $("#addSalary"),
+            area: ['400px', '500px'],
+            btn:['添加','取消'],
+            yes: function (index,layero) {
+
+                var consume_money = $("#consume_money").val();
+                var consume_type = $("#consume_type").val();
+                var consume_remark = $("#consume_remark").val();
+
+                if(consume_money == "" || consume_remark == "") {
+                    layer.msg("信息未填写完整",{icon:5});
+                    return;
+                }
+                layer.load(2,{shade:0.3});
+                $.ajax({
+                    url:URL+"consume/addConsume",
+                    type:"get",
+                    dataType:"json",
+                    data:{
+                        sessionId:SESSIONID,
+                        consumeType:consume_type,
+                        consumeMoney:consume_money,
+                        consumeRemark:consume_remark,
+                    },
+                    success:function(data){
+                        layer.closeAll("loading");
+                        console.log(data);
+                        if(data.code == 200) {
+                            layer.msg("添加成功,请在列表查看",{icon:6,time:2000},function(){
+                                layer.closeAll("page");
+                                findConsume(1);
+                            });
+                        } else if(data.code == 209){
+                            window.location.href = "./login.html";
+                        } else {
+                            layer.msg(data.msg,{icon:2});
+                        }
+
+                    },error:function(jqXHR, textStatus, errorThrown) {
+                        var data = jqXHR.responseText;
+                        if(jqXHR.status == 404){
+                            top.location.href = "404.html";
+                        } else if(jqXHR.status == 500){
+                            top.location.href = "500.html";
+                        } else {
+                            layer.msg(data.msg,{icon:2});
+                        }
+                    }
+                });
+            }
+        });
+    }
+</script>
+</body>
+
+</html>
