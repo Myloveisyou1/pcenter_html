@@ -124,10 +124,11 @@
                     }
                     console.log(html);
                     $("#myTable").html(html);
-                } else if(data.code == 209){
-                    window.location.href = "./login.html";
+                } else if (data.code == 209){
+                    parent.layer.msg(data.msg,{icon:2});
+                    top.location.href = "../login.html";
                 } else {
-                    layer.msg(data.msg,{icon:2});
+                    parent.layer.msg(data.msg,{icon:2});
                 }
 
             },error:function(jqXHR, textStatus, errorThrown) {
@@ -137,7 +138,7 @@
                 } else if(jqXHR.status == 500){
                     top.location.href = "500.html";
                 } else {
-                    layer.msg(data.msg,{icon:2});
+                    parent.layer.msg(data.msg,{icon:2});
                 }
             }
         });
@@ -182,8 +183,9 @@
                             layer.msg("版本发布成功",{icon:6,time:2000},function(){
                                 location.reload();
                             });
-                        } else if(data.code == 209){
-                            window.location.href = "../login.html";
+                        } else if (data.code == 209){
+                            layer.msg(data.msg,{icon:2});
+                            top.location.href = "../login.html";
                         } else {
                             layer.msg(data.msg,{icon:2});
                         }

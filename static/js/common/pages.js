@@ -2,16 +2,18 @@
  * Created by Administrator on 2018/6/6 0006.
  */
 
-var pp = "";
-/**
+var totalPage = 0,pp = "",c = '"b"',d = 'this.value=this.value.replace(/[^0-9]/g,"")',to = "onkeyup='"+d+",document.getElementById("+c+").value=this.value' onblur='document.getElementById("+c+").value=this.value'";
+/**this.value=this.value.replace(/[^\d]/g,'')
  * 处理分页
  */
+
 function pagesUtils(pages,method) {
     //总数据
+    c = method;
     var count = pages.totalCount;
     $("#totalCount").html("共有数据："+count+" 条");
     //分页数据
-    var totalPage = pages.totalPage;
+    totalPage = pages.totalPage;
     var p = '';
     //一直显示第一页,当是第一页的时候无法点击上一页按钮
     if (pages.pageNumber == 1) {
@@ -87,7 +89,18 @@ function pagesUtils(pages,method) {
         p += '<span class="layui-laypage-curr"><em class="layui-laypage-em"></em><em>'+totalPage+'</em> </span>';
         p += '<a href="javascript:;" class="layui-laypage-next layui-disabled" data-page="2"><i class="layui-icon"></i></a>';
     }
-    p +='<span class="layui-laypage-skip">到第<input type="text" id="to" min="1" value="" class="layui-input">页<button type="button" class="layui-laypage-btn" onclick="'+method+'($("#to").val())">确定</button></span>';
+    p +='<span class="layui-laypage-skip">到第' +
+        '<input type="text" id="to" min="1" value="" class="layui-input" '+to+'>' +
+        '<input type="hidden" name="b" id="b" onclick="'+method+'(this.value)">'+
+        '页<button type="button" class="layui-laypage-btn" onclick="toPage()">确定</button></span>';
 
     $("#page").html(p);
 }
+
+function toPage() {
+    if($("#b").val() > totalPage) {
+        $("#b").val(totalPage);
+    }
+    $("#b").trigger("click");
+}
+

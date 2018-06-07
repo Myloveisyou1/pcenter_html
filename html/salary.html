@@ -225,10 +225,11 @@
                     }
 
                     $("#myTable").html(html);
-                } else if(data.code == 209){
-                    window.location.href = "./login.html";
+                } else if (data.code == 209){
+                    parent.layer.msg(data.msg,{icon:2});
+                    top.location.href = "../login.html";
                 } else {
-                    layer.msg(data.msg,{icon:2});
+                    parent.layer.msg(data.msg,{icon:2});
                 }
 
             },error:function(jqXHR, textStatus, errorThrown) {
@@ -238,7 +239,7 @@
                 } else if(jqXHR.status == 500){
                     top.location.href = "500.html";
                 } else {
-                    layer.msg(data.msg,{icon:2});
+                    parent.layer.msg(data.msg,{icon:2});
                 }
             }
         });
@@ -288,8 +289,9 @@
                                 layer.closeAll("page");
                                 findSalaryType();
                             });
-                        } else if(data.code == 209){
-                            window.location.href = "./login.html";
+                        } else if (data.code == 209){
+                            layer.msg(data.msg,{icon:2});
+                            top.location.href = "../login.html";
                         } else {
                             layer.msg(data.msg,{icon:2});
                         }
@@ -330,9 +332,9 @@
                     if(data.code == 200) {
                         layer.msg(data.msg,{icon:6});
                         findSalaryType();
-                    } else if(data.code == 209){
-                        layer.msg(data.msg,{icon:6});
-                        window.location.href = "./login.html";
+                    } else if (data.code == 209){
+                        layer.msg(data.msg,{icon:2});
+                        top.location.href = "../login.html";
                     } else {
                         layer.msg(data.msg,{icon:2});
                     }
@@ -374,8 +376,9 @@
                     $("#deductions_way").find("option[value='"+data.data.sdeductionsType+"']").attr("selected",true);
                     $("#salary_type").find("option[value='"+data.data.stype+"']").attr("selected",true);
                     form.render("select","selFilter");
-                } else if(data.code == 209){
-                    window.location.href = "./login.html";
+                } else if (data.code == 209){
+                    layer.msg(data.msg,{icon:2});
+                    top.location.href = "../login.html";
                 } else {
                     layer.msg(data.msg,{icon:2});
                 }
@@ -431,8 +434,9 @@
                                 layer.closeAll("page");
                                 findSalaryType();
                             });
-                        } else if(data.code == 209){
-                            window.location.href = "./login.html";
+                        } else if (data.code == 209){
+                            layer.msg(data.msg,{icon:2});
+                            top.location.href = "../login.html";
                         } else {
                             layer.msg(data.msg,{icon:2});
                         }
@@ -478,8 +482,9 @@
                         if(data.code == 200) {
                             layer.msg(tishi+"成功",{icon:6});
                             location.reload();
-                        } else if(data.code == 209){
-                            window.location.href = "./login.html";
+                        } else if (data.code == 209){
+                            layer.msg(data.msg,{icon:2});
+                            top.location.href = "../login.html";
                         } else {
                             layer.msg(data.msg,{icon:2});
                         }

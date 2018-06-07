@@ -33,6 +33,7 @@
         <hr class="hr15">
         <input value="登录" lay-submit lay-filter="login" style="width:100%;" type="submit" onclick="login()">
         <hr class="hr20" >
+        <span style="font-size: 12px;">测试账号test/123456</span>
   <!--  </form>-->
 </div>
 
@@ -68,7 +69,7 @@
                     MENU = JSON.stringify(data.data.menu);
                     console.log(MENU);
                     setCookie("SESSIONID",SESSIONID,1800*1000);
-                    setCookie("MENU",MENU,1800*1000);
+//                    setCookie("MENU",MENU,1800*1000);
                     setCookie("USER",USER,1800*1000);
                     window.location.href = "html/home.html";
                 } else {

@@ -55,47 +55,66 @@
 <script type="text/javascript">
 
     $(function() {
-
-        /*if (MENU == null || MENU != "" || MENU == undefined) {
-            layer.msg('登陆已失效', {
-                icon: 5,
-                time: 2000 //2秒关闭（如果不配置，默认是3秒）
-            }, function(){
-                window.location.href = "login.html";
-            });
-            return;
-        }*/
-
         /**
          * 加载菜单信息
          */
-        console.log(MENU);
-        var parent = "",a = "";
-        for (var i=0;i<MENU.length;i++) {
-            parent += '<li><a href="javascript:;"><i class="iconfont">'+MENU[i].icon+'</i>' +
-                    '<cite>'+MENU[i].menuName+'</cite>' +
-                    '<i class="iconfont nav_right">&#xe697;</i></a>';
-            //遍历二级菜单
-            var menuLists = MENU[i].menuList;
-            if(menuLists.length > 0) {
-                var child = "";
-                parent += '<ul class="sub-menu">';
-                for(var j=0;j<menuLists.length;j++) {
-                    child += '<li>' +
-                            '<a _href="'+menuLists[j].url+'">' +
-                            '<i class="iconfont">'+menuLists[j].icon+'</i>'+
-                            '<cite>'+menuLists[j].menuName+'</cite>' +
-                            '</a></li>';
-                }
-                child += '</ul>';
-                parent += child+'</li>';
-            } else {
-                parent += '</li>';
-            }
-        }
-        console.log(parent);
+        $.ajax({
+            url:URL+"menu/findMenuByRole",
+            type:"get",
+            dataType:"json",
+            async:false,
+            data:{
+                sessionId:SESSIONID,
+                roleId:USER.roleId
+            },
+            success:function(data){
+                console.log(data);
+                var MENU = data.data;
+                if(data.code == 200) {
+                    var parent = "",a = "";
+                    for (var i=0;i<MENU.length;i++) {
+                        parent += '<li><a href="javascript:;"><i class="iconfont">'+MENU[i].icon+'</i>' +
+                                '<cite>'+MENU[i].menuName+'</cite>' +
+                                '<i class="iconfont nav_right">&#xe697;</i></a>';
+                        //遍历二级菜单
+                        var menuLists = MENU[i].menuList;
+                        if(menuLists.length > 0) {
+                            var child = "";
+                            parent += '<ul class="sub-menu">';
+                            for(var j=0;j<menuLists.length;j++) {
+                                if (menuLists[j].menuName.split(";")[1] != 1) {
+                                    child += '<li>' +
+                                            '<a _href="'+menuLists[j].url+'">' +
+                                            '<i class="iconfont">'+menuLists[j].icon+'</i>'+
+                                            '<cite>'+menuLists[j].menuName.split(";")[0]+'</cite>' +
+                                            '</a></li>';
+                                }
 
-        $("#nav").html(parent);
+                            }
+                            child += '</ul>';
+                            parent += child+'</li>';
+                        } else {
+                            parent += '</li>';
+                        }
+                    }
+                    console.log(parent);
+
+                    $("#nav").html(parent);
+                } else {
+                    layer.msg(data.msg,{icon:5});
+                }
+            },error:function(jqXHR, textStatus, errorThrown) {
+                layer.closeAll("loading");
+                var data = jqXHR.responseText;
+                if(jqXHR.status == 404){
+                    top.location.href = "404.html";
+                } else if(jqXHR.status == 500){
+                    top.location.href = "500.html";
+                } else {
+                    layer.msg(data.msg,{icon:2});
+                }
+            }
+        });
 
 
         var tab = {

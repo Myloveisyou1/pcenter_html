@@ -145,6 +145,11 @@
         var consumeType = $("#consumeType").val();
         var start = $("#start").val();
         var end = $("#end").val();
+        var test = /^[1-9]\d*$/;
+        if (!test.test(pageNum)) {
+            parent.layer.msg("页码输入不正确",{icon:2});
+            return;
+        }
         parent.layer.load(2,{shade:0.3});
         $.ajax({
             url:URL+"consume/findConsume",
@@ -181,10 +186,11 @@
                     $("#myTable").html(html);
                     //处理分页数据
                     pagesUtils(page,"findConsume");
-                } else if(data.code == 209){
-                    window.location.href = "./login.html";
+                } else if (data.code == 209){
+                    parent.layer.msg(data.msg,{icon:2});
+                    top.location.href = "../login.html";
                 } else {
-                    layer.msg(data.msg,{icon:2});
+                    parent.layer.msg(data.msg,{icon:2});
                 }
 
             },error:function(jqXHR, textStatus, errorThrown) {
@@ -194,7 +200,7 @@
                 } else if(jqXHR.status == 500){
                     top.location.href = "500.html";
                 } else {
-                    layer.msg(data.msg,{icon:2});
+                    parent.layer.msg(data.msg,{icon:2});
                 }
             }
         });
@@ -240,8 +246,9 @@
                                 layer.closeAll("page");
                                 findConsume(1);
                             });
-                        } else if(data.code == 209){
-                            window.location.href = "./login.html";
+                        } else if (data.code == 209){
+                            layer.msg(data.msg,{icon:2});
+                            top.location.href = "../login.html";
                         } else {
                             layer.msg(data.msg,{icon:2});
                         }

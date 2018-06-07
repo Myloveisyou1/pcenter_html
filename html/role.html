@@ -91,10 +91,9 @@
                         if(data.code == 200) {
                             layer.msg(tishi+"成功",{icon:6});
                             location.reload();
-                        } else if(data.code == 404){
-                            window.location.href = "404.html";
-                        } else if(data.code == 500){
-                            window.location.href = "500.html";
+                        } else if (data.code == 209){
+                            layer.msg(data.msg,{icon:2});
+                            top.location.href = "../login.html";
                         } else {
                             layer.msg(data.msg,{icon:2});
                         }
@@ -132,10 +131,9 @@
                         if(data.code == 200) {
                             layer.msg("删除成功",{icon:6});
                             location.reload();
-                        } else if(data.code == 404){
-                            window.location.href = "404.html";
-                        } else if(data.code == 500){
-                            window.location.href = "500.html";
+                        } else if (data.code == 209){
+                            layer.msg(data.msg,{icon:2});
+                            top.location.href = "../login.html";
                         } else {
                             layer.msg(data.msg,{icon:2});
                         }
@@ -202,12 +200,11 @@
                     }
                     $("#totalCount").html("共有数据："+data.totalCount+"条");
                     $("#myTable").html(html);
-                } else if(data.code == 404){
-                    window.location.href = "404.html";
-                } else if(data.code == 500){
-                    window.location.href = "500.html";
+                } else if (data.code == 209){
+                    parent.layer.msg(data.msg,{icon:2});
+                    top.location.href = "../login.html";
                 } else {
-                    layer.msg(data.msg,{icon:2});
+                    parent.layer.msg(data.msg,{icon:2});
                 }
             },error:function(jqXHR, textStatus, errorThrown) {
                 var data = jqXHR.responseText;
@@ -216,7 +213,7 @@
                 } else if(jqXHR.status == 500){
                     top.location.href = "500.html";
                 } else {
-                    layer.msg(data.msg,{icon:2});
+                    parent.layer.msg(data.msg,{icon:2});
                 }
             }
         });

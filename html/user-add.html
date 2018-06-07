@@ -127,10 +127,9 @@
                     $("#L_email").val(email);
 
 
-                } else if(data.code == 404){
-                    window.location.href = "404.html";
-                } else if(data.code == 500){
-                    window.location.href = "500.html";
+                } else if (data.code == 209){
+                    layer.msg(data.msg,{icon:2});
+                    top.location.href = "../login.html";
                 } else {
                     layer.msg(data.msg,{icon:2});
                 }
@@ -205,10 +204,9 @@
                             //location.reload();
                         });
 
-                    } else if(data.code == 404){
-                        window.location.href = "404.html";
-                    } else if(data.code == 500){
-                        window.location.href = "500.html";
+                    } else if (data.code == 209){
+                        layer.msg(data.msg,{icon:2});
+                        top.location.href = "../login.html";
                     } else {
                         layer.msg(data.msg,{icon:2});
                     }
@@ -243,10 +241,9 @@
                             //location.reload();
                         });
 
-                    } else if(data.code == 404){
-                        window.location.href = "404.html";
-                    } else if(data.code == 500){
-                        window.location.href = "500.html";
+                    } else if (data.code == 209){
+                        layer.msg(data.msg,{icon:2});
+                        top.location.href = "../login.html";
                     } else {
                         layer.msg(data.msg,{icon:2});
                     }
@@ -299,12 +296,11 @@
                         }
                     }
                     $("#roles").html(str);
-                } else if(data.code == 404){
-                    window.location.href = "404.html";
-                } else if(data.code == 500){
-                    window.location.href = "500.html";
+                } else if (data.code == 209){
+                    parent.layer.msg(data.msg,{icon:2});
+                    top.location.href = "../login.html";
                 } else {
-                    layer.msg(data.msg,{icon:2});
+                    parent.layer.msg(data.msg,{icon:2});
                 }
 
             },error:function(jqXHR, textStatus, errorThrown) {
@@ -314,7 +310,7 @@
                 } else if(jqXHR.status == 500){
                     top.location.href = "500.html";
                 } else {
-                    layer.msg(data.msg,{icon:2});
+                    parent.layer.msg(data.msg,{icon:2});
                 }
             }
         });
